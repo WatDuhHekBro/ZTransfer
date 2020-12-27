@@ -1,0 +1,20 @@
+[package]
+name = "ztransfer-backend"
+version = "0.1.0"
+authors = ["WatDuhHekBro <44940783+WatDuhHekBro@users.noreply.github.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+actix = "0.10.0"
+actix-broker = "0.3.1"
+actix-files = "0.4.1"
+actix-multipart = "0.3.0"
+actix-web = "3.3.2"
+actix-web-actors = "3.0.0"
+env_logger = "0.8.2"
+futures = "0.3.8"
+sanitize-filename = "0.3.0"
+serde = {version="1.0.118", features = ["derive"]}
+serde_json = "1.0.60"

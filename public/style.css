@@ -1,0 +1,32 @@
+html, body
+{
+	height: 100%;
+}
+
+body
+{
+	margin: 0;
+	background: lightblue;
+	padding: 5% 10%;
+	
+}
+
+.section
+{
+	background: white;
+	border-radius: 5px;
+	padding: 1%;
+	margin: 1%;
+	text-align: center;
+}
+
+.section h1
+{
+	margin: 1%;
+}
+
+#files
+{
+	table-layout: fixed;
+	width: 100%;
+}
