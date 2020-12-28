@@ -1,13 +1,22 @@
+use crate::structures::{AddFile, Broadcast, BroadcastMessage, ADD_FILE};
+use actix::Addr;
 use actix_multipart::Multipart;
 use actix_web::{http, post, web, Error, HttpRequest, HttpResponse};
 use futures::{StreamExt, TryStreamExt};
-//use serde::Deserialize;
 use sanitize_filename::sanitize;
+use serde_json::to_string;
 use std::fs::File;
 use std::io::Write;
+use std::sync::{Arc, Mutex};
 
 #[post("upload")]
-pub async fn upload(mut payload: Multipart, header: HttpRequest) -> Result<HttpResponse, Error> {
+pub async fn upload(
+    mut payload: Multipart,
+    header: HttpRequest,
+    data: web::Data<Arc<Mutex<Addr<Broadcast>>>>,
+) -> Result<HttpResponse, Error> {
+    println!("transfer called");
+    let broadcaster = &*data.lock().unwrap();
     let size = get_size_from_header(&header);
 
     while let Ok(Some(mut field)) = payload.try_next().await {
@@ -38,9 +47,20 @@ pub async fn upload(mut payload: Multipart, header: HttpRequest) -> Result<HttpR
             // filesystem operations are blocking, we have to use threadpool
             f = web::block(move || f.write_all(&data).map(|_| f)).await?;
         }
+
+        // I can't think of any reason why serialization would fail here
+        broadcaster.do_send(BroadcastMessage(
+            to_string(&AddFile {
+                action: String::from(ADD_FILE),
+                filename: String::from(filename),
+                size: size.unwrap_or(0),
+            })
+            .expect("Serialization Error?!"),
+        ));
     }
 
     println!("File Uploading Complete");
+
     Ok(HttpResponse::SeeOther()
         .header(http::header::LOCATION, "/")
         .finish())

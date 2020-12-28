@@ -1,5 +1,7 @@
 // Warning: Extremely cursed "prototyping" code below, proceed with caution.
 const table = document.getElementById("files");
+const uploader = document.getElementById("uploader");
+const customUploadButton = document.getElementById("custom-upload");
 const ws = new WebSocket((() => {
 	const url = new URL(window.location.href);
 	
@@ -35,14 +37,19 @@ ws.onopen = console.log;
 ws.onclose = console.warn;
 ws.onerror = console.error;
 ws.onmessage = message => {
-	console.log(message);
 	let data;
 	
-	if(data = tryParse(message))
+	if(data = tryParse(message.data))
 	{
+		console.log(data);
 		const action = HANDLER[data.action];
 		action && action(data);
 	}
+};
+
+customUploadButton.onclick = () => {
+	ajaxUpload(uploader.files);
+	uploader.value = "";
 };
 
 /**
@@ -51,54 +58,53 @@ ws.onmessage = message => {
  */
 function addFile(filename, size)
 {
-	const row = document.createElement("tr");
+	const row = table.insertRow(table.rows.length);
 	
-	const fn = document.createElement("td");
+	const fn = row.insertCell(row.cells.length);
 	fn.innerText = filename;
-	row.appendChild(fn);
 	
-	const sz = document.createElement("td");
+	const sz = row.insertCell(row.cells.length);
 	sz.innerText = getSizeString(size);
-	row.appendChild(sz);
 	
-	const ex = document.createElement("td");
-	ex.appendChild(createDownloadButton(`/download?file=${encodeURIComponent(filename)}`));
-	ex.appendChild(createDeleteButton(filename));
-	row.appendChild(ex);
-	
-	table.appendChild(row);
+	const ex = row.insertCell(row.cells.length);
+	ex.appendChild(createDownloadButton(`/download/${encodeURIComponent(filename)}`));
+	//ex.appendChild(createDeleteButton(filename));
 }
 
+/**
+ * @param {FileList} files
+ */
+function ajaxUpload(files)
+{
+	const url = new URL(window.location.href);
+	const formdata = new FormData();
+	
+	for(const file of files)
+		formdata.append("file", file);
+	
+	const request = new XMLHttpRequest();
+	request.onload = console.log;
+	request.open("POST", url.origin + "/upload", true);
+	request.send(formdata);
+	return request;
+}
+
+// Find a better solution to this spaghetti code later
 function getSizeString(size)
 {
 	let factor;
 	
 	// multiplying/dividing by 1024 can also be applied from << 0xA and >> 0xA respectively.
 	if(size >= (factor = Math.pow(1024, 4)))
-	{
-		const sizeOutput = (size / factor).toFixed(2);
-		return `${sizeOutput} TB`;
-	}
+		return `${(size / factor).toFixed(2)} TB`;
 	else if(size >= (factor = Math.pow(1024, 3)))
-	{
-		const sizeOutput = (size / factor).toFixed(2);
-		return `${sizeOutput} GB`;
-	}
+		return `${(size / factor).toFixed(2)} GB`;
 	else if(size >= (factor = Math.pow(1024, 2)))
-	{
-		const sizeOutput = (size / factor).toFixed(2);
-		return `${sizeOutput} MB`;
-	}
+		return `${(size / factor).toFixed(2)} MB`;
 	else if(size >= (factor = 1024))
-	{
-		const sizeOutput = (size / factor).toFixed(2);
-		return `${sizeOutput} KB`;
-	}
-	else if(size >= (factor = 0))
-	{
-		const sizeOutput = size === 0 ? 0 : (size / factor).toFixed(2);
-		return `${sizeOutput} B`;
-	}
+		return `${(size / factor).toFixed(2)} KB`;
+	else if(size >= 0)
+		return `${(size / factor).toFixed(2)} B`;
 	else
 		throw new Error("You can't have negative file sizes!");
 }
@@ -107,23 +113,31 @@ function createDownloadButton(href)
 {
 	const button = document.createElement("button");
 	
+	button.innerText = "Download";
 	button.onclick = () => {
 		const dlink = document.createElement("a");
 		dlink.download = href;
-		dlink.href = window.URL.createObjectURL(new Blob([contents]));
+		dlink.href = href;
 		dlink.click();
 		dlink.remove();
-	}
+	};
 	
 	return button;
 }
 
 function createDeleteButton(filename)
 {
-	ws.send(JSON.stringify({
-		action: "SEND_DELETE_REQUEST",
-		filename
-	}));
+	const button = document.createElement("button");
+	
+	button.innerText = "Delete";
+	button.onclick = () => {
+		ws.send(JSON.stringify({
+			action: "SEND_DELETE_REQUEST",
+			filename
+		}));
+	};
+	
+	return button;
 }
 
 function tryParse(json)

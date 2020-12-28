@@ -7,14 +7,10 @@
 		<script src="script.js" defer></script>
 	</head>
 	<body>
-		<!-- File Upload Section -- [File Name, Date/Time Uploaded, File Size, Download Button] -->
 		<div class="section">
 			<h1>Upload</h1>
-			<form action="upload" method="POST" enctype="multipart/form-data">
-			<input type="file" name="tea" multiple>
-			<button>Uploadé</button>
-			<!--<input type="submit">-->
-			</form>
+			<input id="uploader" type="file" multiple>
+			<button id="custom-upload">Upload</button>
 		</div>
 		<div class="section">
 			<h1>Download</h1>
@@ -22,18 +18,7 @@
 				<tr>
 					<th>Filename</th>
 					<th>File Size</th>
-					<th></th>
-				</tr>
-				<tr>
-					<td>test.txt</td>
-					<td>86 MB</td>
-					<!-- Link to localhost/download?file=...
-					also ws:// or ws:// + localhost
-					-->
-					<td>
-						<button>Download</button>
-						<button>Delete</button>
-					</td>
+					<th>Actions</th>
 				</tr>
 			</table>
 		</div>

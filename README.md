@@ -1,5 +1,5 @@
 # ZTransfer
-A program that makes use of websockets to provide a real-time interface for simple LAN file transfer. Not intended for public facing servers, as this assumes that all users on your network are trusted individuals.
+A program that makes use of websockets to provide a real-time interface for simple LAN file transfer. Not intended for public facing servers, as this assumes that all users on your network are trusted individuals. *Currently very limited.*
 
 ## Use Cases
 - Transfer files between different computers on a home network without the need of a flash drive or some other hardware.
