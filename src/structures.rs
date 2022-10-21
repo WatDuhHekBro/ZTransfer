@@ -12,17 +12,6 @@ use serde::{Deserialize, Serialize};
 // JSON Structures //
 /////////////////////
 
-#[derive(Deserialize, Debug)]
-pub struct ServerSettings {
-    pub host: String,
-    #[serde(default = "get_default_port")]
-    pub port: u16,
-}
-
-fn get_default_port() -> u16 {
-    80
-}
-
 pub const ADD_FILE: &str = "ADD_FILE";
 pub const REMOVE_FILE: &str = "REMOVE_FILE";
 pub const UPLOAD_PROGRESS: &str = "UPLOAD_PROGRESS";

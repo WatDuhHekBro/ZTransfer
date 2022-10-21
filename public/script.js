@@ -146,7 +146,7 @@ function tryParse(json)
 	{
 		return JSON.parse(json)
 	}
-	catch
+	catch(_)
 	{
 		return false;
 	}

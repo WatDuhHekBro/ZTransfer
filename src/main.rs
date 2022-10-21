@@ -1,27 +1,30 @@
+mod structures;
+mod transfer;
+mod util;
+mod websocket;
+
 use actix::Actor;
 use actix_files::Files;
 use actix_web::{App, HttpServer};
-use serde_json::from_str;
+use dotenvy::dotenv;
 use std::fs;
 use std::sync::{Arc, Mutex};
-use ztransfer::{
-    structures::{Broadcast, ServerSettings},
-    transfer, websocket,
-};
+use structures::Broadcast;
+use util::port;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    let settings;
+    dotenv().ok();
 
-    // Read settings.json
-    if let Ok(settings_file) = fs::read_to_string("settings.json") {
-        settings = from_str::<ServerSettings>(&settings_file)?;
-    } else {
-        settings = ServerSettings {
-            host: String::from("127.0.0.1"),
-            port: 8080,
-        };
-    }
+    #[cfg(debug_assertions)]
+    let host = "127.0.0.1";
+    #[cfg(not(debug_assertions))]
+    let host = "0.0.0.0";
+
+    let port = port();
+    let address = format!("{}:{}", host, port);
+
+    println!("Now hosting {} on {}.", env!("CARGO_PKG_NAME"), address);
 
     // Then initialize the server
     let broadcaster = Arc::new(Mutex::new(Broadcast {}.start()));
@@ -43,7 +46,7 @@ async fn main() -> std::io::Result<()> {
             // Host static files from "public" and host "index.html" as the index.
             .service(Files::new("/", "public").index_file("index.html"))
     })
-    .bind(format!("{}:{}", settings.host, settings.port))?
+    .bind(address)?
     .run()
     .await
 }

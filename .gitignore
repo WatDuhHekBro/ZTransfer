@@ -1,3 +1,7 @@
 /target
 /tmp
 settings.json
+*.exe
+*.bat
+ztransfer
+.env
