@@ -24,7 +24,12 @@ async fn main() -> std::io::Result<()> {
     let port = port();
     let address = format!("{}:{}", host, port);
 
-    println!("Now hosting {} on {}.", env!("CARGO_PKG_NAME"), address);
+    println!(
+        "Now hosting {} (v{}) on {}.",
+        env!("CARGO_PKG_NAME"),
+        env!("CARGO_PKG_VERSION"),
+        address
+    );
 
     // Then initialize the server
     let broadcaster = Arc::new(Mutex::new(Broadcast {}.start()));

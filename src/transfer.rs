@@ -1,10 +1,9 @@
-use crate::structures::{AddFile, Broadcast, BroadcastMessage, ADD_FILE};
+use crate::structures::{Broadcast, BroadcastMessage, WsMessage};
 use actix::Addr;
 use actix_multipart::Multipart;
 use actix_web::{http, post, web, Error, HttpRequest, HttpResponse};
 use futures::{StreamExt, TryStreamExt};
 use sanitize_filename::sanitize;
-use serde_json::to_string;
 use std::fs::File;
 use std::io::Write;
 use std::sync::{Arc, Mutex};
@@ -50,8 +49,7 @@ pub async fn upload(
 
         // I can't think of any reason why serialization would fail here
         broadcaster.do_send(BroadcastMessage(
-            to_string(&AddFile {
-                action: String::from(ADD_FILE),
+            serde_json::to_string(&WsMessage::AddFile {
                 filename: String::from(filename),
                 size: size.unwrap_or(0),
             })

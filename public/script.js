@@ -4,14 +4,14 @@ const uploader = document.getElementById("uploader");
 const customUploadButton = document.getElementById("custom-upload");
 const ws = new WebSocket((() => {
 	const url = new URL(window.location.href);
-	
+
 	if(!url.protocol.startsWith("http"))
 		return "ws://localhost/";
-	
+
 	const isSecure = url.protocol === "https:";
 	url.protocol = isSecure ? "wss:" : "ws:";
 	url.pathname = "/websocket";
-	
+
 	return url.toString();
 })());
 
@@ -26,7 +26,7 @@ const HANDLER = {
 		{
 			const row = table.rows[i];
 			const filename = row.cells[0].innerText;
-			
+
 			if(data.filename === filename)
 				table.deleteRow(i);
 		}
@@ -38,7 +38,7 @@ ws.onclose = console.warn;
 ws.onerror = console.error;
 ws.onmessage = message => {
 	let data;
-	
+
 	if(data = tryParse(message.data))
 	{
 		console.log(data);
@@ -59,13 +59,13 @@ customUploadButton.onclick = () => {
 function addFile(filename, size)
 {
 	const row = table.insertRow(table.rows.length);
-	
+
 	const fn = row.insertCell(row.cells.length);
 	fn.innerText = filename;
-	
+
 	const sz = row.insertCell(row.cells.length);
 	sz.innerText = getSizeString(size);
-	
+
 	const ex = row.insertCell(row.cells.length);
 	ex.appendChild(createDownloadButton(`/download/${encodeURIComponent(filename)}`));
 	//ex.appendChild(createDeleteButton(filename));
@@ -78,10 +78,10 @@ function ajaxUpload(files)
 {
 	const url = new URL(window.location.href);
 	const formdata = new FormData();
-	
+
 	for(const file of files)
 		formdata.append("file", file);
-	
+
 	const request = new XMLHttpRequest();
 	request.onload = console.log;
 	request.open("POST", url.origin + "/upload", true);
@@ -93,7 +93,7 @@ function ajaxUpload(files)
 function getSizeString(size)
 {
 	let factor;
-	
+
 	// multiplying/dividing by 1024 can also be applied from << 0xA and >> 0xA respectively.
 	if(size >= (factor = Math.pow(1024, 4)))
 		return `${(size / factor).toFixed(2)} TB`;
@@ -112,7 +112,7 @@ function getSizeString(size)
 function createDownloadButton(href)
 {
 	const button = document.createElement("button");
-	
+
 	button.innerText = "Download";
 	button.onclick = () => {
 		const dlink = document.createElement("a");
@@ -121,14 +121,14 @@ function createDownloadButton(href)
 		dlink.click();
 		dlink.remove();
 	};
-	
+
 	return button;
 }
 
 function createDeleteButton(filename)
 {
 	const button = document.createElement("button");
-	
+
 	button.innerText = "Delete";
 	button.onclick = () => {
 		ws.send(JSON.stringify({
@@ -136,7 +136,7 @@ function createDeleteButton(filename)
 			filename
 		}));
 	};
-	
+
 	return button;
 }
 

@@ -12,36 +12,24 @@ use serde::{Deserialize, Serialize};
 // JSON Structures //
 /////////////////////
 
-pub const ADD_FILE: &str = "ADD_FILE";
-pub const REMOVE_FILE: &str = "REMOVE_FILE";
-pub const UPLOAD_PROGRESS: &str = "UPLOAD_PROGRESS";
-pub const SEND_DELETE_REQUEST: &str = "SEND_DELETE_REQUEST";
-
-#[derive(Serialize, Deserialize)]
-pub struct AddFile {
-    pub action: String,
-    pub filename: String,
-    pub size: u64,
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct RemoveFile {
-    pub action: String,
-    pub filename: String,
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct UploadProgress {
-    pub action: String,
-    pub filename: String,
-    pub progress: u64,
-    pub total: u64,
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct SendDeleteRequest {
-    pub action: String,
-    pub filename: String,
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE", tag = "action")]
+pub enum WsMessage {
+    AddFile {
+        filename: String,
+        size: u64,
+    },
+    RemoveFile {
+        filename: String,
+    },
+    UploadProgress {
+        filename: String,
+        progress: u64,
+        total: u64,
+    },
+    SendDeleteRequest {
+        filename: String,
+    },
 }
 
 ////////////////////////

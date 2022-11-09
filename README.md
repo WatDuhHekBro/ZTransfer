@@ -1,14 +1,23 @@
 # ZTransfer
-A program that makes use of websockets to provide a real-time interface for simple LAN file transfer. Not intended for public facing servers, as this assumes that all users on your network are trusted individuals. *Currently very limited.*
+
+A program that makes use of websockets to provide a real-time interface for simple LAN file transfer. Not intended for public facing servers, as this assumes that all users on your network are trusted individuals. _Currently very limited._
 
 ## Use Cases
+
 - Transfer files between different computers on a home network without the need of a flash drive or some other hardware.
 - Provide a transfer mechanism between a host machine and a guest machine in case you're too lazy to setup shared folders with a VM.
 
 # "Documentation"
 
+## Command Line Use
+
+- `ztransfer` starts the server on whatever the `.env` specifies or port 3000
+- `ztransfer (port)` starts the server on a specified port, ignoring `.env`
+
 ## Server-To-Client Messages
-*Files with the same name will replace each other.*
+
+_Files with the same name will replace each other._
+
 ```json
 {
 	"action": "ADD_FILE",
@@ -28,9 +37,10 @@ A program that makes use of websockets to provide a real-time interface for simp
 ```
 
 ## Client-To-Server Messages
+
 ```json
 {
-	"action": "SEND_DELETE_REQUEST",
-	"filename": "test.txt"
+  "action": "SEND_DELETE_REQUEST",
+  "filename": "test.txt"
 }
 ```
